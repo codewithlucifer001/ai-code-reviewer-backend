@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @keyframes scan {
   0% { top: -26px; }
   100% { top: 220px; }
