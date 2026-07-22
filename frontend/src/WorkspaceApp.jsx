@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Editor from '@monaco-editor/react';
 import toast, { Toaster } from 'react-hot-toast';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from '@clerk/clerk-react';
 import { 
   Terminal, Shield, Bug, Folder, Search, Settings, 
   FileText, Play, RefreshCw, Bell, Layers, Activity, 
@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 
 export default function WorkspaceApp() {
+  // Clerk Auth Token
+  const { getToken } = useAuth();
+
   // Navigation & UI States
   const [activeTab, setActiveTab] = useState('workspace'); // workspace | architecture | telemetry | config
   const [selectedFile, setSelectedFile] = useState('analyzer.py');
@@ -89,9 +92,15 @@ export default function WorkspaceApp() {
     toast('Triggering AST Static Engine...', { icon: '🤖' });
 
     try {
+      // Retrieve Clerk JWT Token for authenticated API request
+      const token = await getToken();
+
       const response = await fetch('https://codeflow-backend-api.vercel.app/api/review', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ filename: selectedFile, code: code })
       });
 
