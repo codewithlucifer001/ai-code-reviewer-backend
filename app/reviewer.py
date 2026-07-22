@@ -34,7 +34,7 @@ def generate_ai_review(code_content: str, ast_metadata: dict) -> str:
     
     # Payload adjusted to standard Chat Completion structures
     payload = {
-        "model": "llama3-8b-8192",  # Replace with your preferred cloud model string
+        "model": "llama-3.3-70b-versatile",  # Replace with your preferred cloud model string
         "messages": [
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_prompt}
