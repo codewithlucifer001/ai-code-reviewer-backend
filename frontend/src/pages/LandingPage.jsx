@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LandingPage() {
+  const [isDocsOpen, setIsDocsOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#0A0B0F] text-[#EDEEF3] font-sans relative overflow-x-hidden selection:bg-[#8B7CF6]/30">
       {/* Background Glow */}
@@ -30,7 +33,12 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-[#EDEEF3] transition-colors">Product</a>
             <a href="#how" className="hover:text-[#EDEEF3] transition-colors">How it works</a>
             <a href="#pricing" className="hover:text-[#EDEEF3] transition-colors">Pricing</a>
-            <a href="#" className="hover:text-[#EDEEF3] transition-colors">Docs</a>
+            <button 
+              onClick={() => setIsDocsOpen(true)} 
+              className="hover:text-[#EDEEF3] transition-colors cursor-pointer"
+            >
+              Docs
+            </button>
           </div>
 
           <div className="flex items-center gap-3.5">
@@ -190,6 +198,35 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section id="how" className="py-24 border-t border-[#1B1E29] bg-[#0D0F17]">
+        <div className="max-w-[1180px] mx-auto px-8">
+          <div className="max-w-[560px] mx-auto mb-14 text-center">
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#8B7CF6] mb-3">How it works</div>
+            <h2 className="text-3xl font-bold mb-3">AST-Driven Static Inspection Engine</h2>
+            <p className="text-[#9195A8] text-base">Automated, deterministic security analysis in three steps.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#101219] border border-[#242737] p-6 rounded-xl relative">
+              <span className="text-[#8B7CF6] font-mono text-xs font-bold block mb-2">01 // SOURCE INGESTION</span>
+              <h3 className="text-[#EDEEF3] font-bold text-base mb-2">Code Stream Buffer</h3>
+              <p className="text-xs text-[#9195A8] leading-relaxed">Monaco editor or GitHub webhooks push raw syntax arrays directly into memory queues.</p>
+            </div>
+            <div className="bg-[#101219] border border-[#242737] p-6 rounded-xl relative">
+              <span className="text-[#34D399] font-mono text-xs font-bold block mb-2">02 // AST TRANSFORM</span>
+              <h3 className="text-[#EDEEF3] font-bold text-base mb-2">Syntax Tree Parsing</h3>
+              <p className="text-xs text-[#9195A8] leading-relaxed">Translates code into Abstract Syntax Graphs to identify logic flaws and exposed credentials without execution.</p>
+            </div>
+            <div className="bg-[#101219] border border-[#242737] p-6 rounded-xl relative">
+              <span className="text-[#F0525C] font-mono text-xs font-bold block mb-2">03 // INLINE REMEDIATION</span>
+              <h3 className="text-[#EDEEF3] font-bold text-base mb-2">Vulnerability Patching</h3>
+              <p className="text-xs text-[#9195A8] leading-relaxed">Generates real-time severity metrics and structured line-by-line patch suggestions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="py-24 bg-[#0A0B0F]">
         <div className="max-w-[1180px] mx-auto px-8">
@@ -270,6 +307,67 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Documentation Modal */}
+      <AnimatePresence>
+        {isDocsOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            onClick={() => setIsDocsOpen(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-[#101219] border border-[#242737] max-w-2xl w-full rounded-2xl shadow-2xl p-6 text-left relative max-h-[80vh] overflow-y-auto custom-scrollbar"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-[#1B1E29] pb-4 mb-4">
+                <div>
+                  <h3 className="text-lg font-bold font-mono text-[#EDEEF3]">Code Flow Documentation</h3>
+                  <p className="text-xs text-[#9195A8] font-mono">QUICKSTART GUIDE & API SPECS</p>
+                </div>
+                <button 
+                  onClick={() => setIsDocsOpen(false)} 
+                  className="text-[#9195A8] hover:text-white px-2 py-1 rounded-lg border border-[#242737] hover:bg-[#161923] cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-6 text-xs text-[#EDEEF3] font-sans">
+                <div>
+                  <h4 className="font-mono font-bold text-[#8B7CF6] text-sm mb-1">1. Authentication</h4>
+                  <p className="text-[#9195A8]">All analysis requests sent to the backend require a valid Bearer JWT header obtained via Clerk session tokens.</p>
+                </div>
+
+                <div>
+                  <h4 className="font-mono font-bold text-[#34D399] text-sm mb-1">2. Review API Endpoint (`POST /api/review`)</h4>
+                  <pre className="bg-[#0A0B0F] p-3 rounded-lg border border-[#242737] font-mono text-[11px] text-[#9195A8] mt-1">
+{`// Payload Format
+{
+  "filename": "analyzer.py",
+  "code": "def check(): pass"
+}`}
+                  </pre>
+                </div>
+
+                <div>
+                  <h4 className="font-mono font-bold text-[#F5A623] text-sm mb-1">3. Core Rule Engine Specs</h4>
+                  <ul className="list-disc list-inside space-y-1 text-[#9195A8] font-mono">
+                    <li>Hardcoded credential & secret key detectors</li>
+                    <li>Infinite loop & unhandled recursion checks</li>
+                    <li>SQL injection and unsafe execution sinks</li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <footer className="border-t border-[#1B1E29] py-10 text-xs text-[#5D6072]">
