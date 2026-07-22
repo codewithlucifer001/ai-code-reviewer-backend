@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 export default function WorkspaceApp() {
-  // Clerk Auth Token
+  // Clerk Auth Token Helper
   const { getToken } = useAuth();
 
   // Navigation & UI States
@@ -34,6 +34,7 @@ export default function WorkspaceApp() {
   const [status, setStatus] = useState(null);
   const [rawReview, setRawReview] = useState('');
   const [displayedReview, setDisplayedReview] = useState('');
+  const [history, setHistory] = useState([]);
   const [logs, setLogs] = useState([
     { time: '10:02:11', txt: 'System core initialized.', type: 'info' },
     { time: '10:02:12', txt: 'AST analytical hooks bound successfully.', type: 'success' }
@@ -51,6 +52,28 @@ export default function WorkspaceApp() {
   const filteredCommands = commandItems.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Fetch Scan History for Authenticated User
+  const fetchHistory = async () => {
+    try {
+      const token = await getToken();
+      const response = await fetch('https://codeflow-backend-api.vercel.app/api/history', {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data.history || []);
+      }
+    } catch (err) {
+      console.error('Failed to load scan history:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   // Monitor Global Hotkeys (Ctrl + K to toggle command search menu)
   useEffect(() => {
@@ -110,6 +133,7 @@ export default function WorkspaceApp() {
         setStatus('success');
         addLog('Token extraction array evaluated successfully.', 'success');
         toast.success('Analysis Finished Successfully!');
+        fetchHistory(); // Sync recent scans history panel
       } else {
         setRawReview(`### ⚠ Server Pipeline Crash\nService returned verification state: ${response.status}`);
         setStatus('error');
@@ -253,7 +277,7 @@ export default function WorkspaceApp() {
                 className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden"
               >
                 {/* Visual Directory Module */}
-                <div className="lg:col-span-2 bg-[#0B1020]/90 border-r border-[#2D3748] p-4 hidden lg:flex flex-col justify-between shadow-inner">
+                <div className="lg:col-span-2 bg-[#0B1020]/90 border-r border-[#2D3748] p-4 hidden lg:flex flex-col justify-between shadow-inner overflow-y-auto">
                   <div>
                     <div className="flex items-center justify-between text-[11px] font-mono font-bold tracking-widest text-slate-400 uppercase border-b border-[#2D3748] pb-2 mb-3">
                       <span>File Explorer</span>
@@ -270,8 +294,37 @@ export default function WorkspaceApp() {
                         </button>
                       ))}
                     </div>
+
+                    {/* Step 3: Live Recent Scans History Panel */}
+                    {history.length > 0 && (
+                      <div className="mt-6 space-y-1 border-t border-[#2D3748] pt-3">
+                        <div className="flex items-center justify-between text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase px-1 mb-2">
+                          <span className="flex items-center space-x-1">
+                            <History size={11} className="text-[#06B6D4]" />
+                            <span>Recent Scans</span>
+                          </span>
+                          <span className="text-[9px] bg-[#111827] px-1.5 py-0.5 rounded border border-[#2D3748]">{history.length}</span>
+                        </div>
+                        <div className="space-y-1 max-h-44 overflow-y-auto custom-scrollbar pr-1">
+                          {history.map((item) => (
+                            <button
+                              key={item.id}
+                              onClick={() => {
+                                setRawReview(item.review);
+                                toast.success(`Loaded scan: ${item.filename}`);
+                              }}
+                              className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs font-mono rounded-lg border border-transparent hover:border-[#2D3748] hover:bg-[#111827] text-slate-400 hover:text-white transition-all cursor-pointer text-left"
+                            >
+                              <span className="truncate max-w-[90px]">{item.filename}</span>
+                              <span className="text-[9px] text-slate-600 font-sans">{item.timestamp ? item.timestamp.split(' ')[1] : ''}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="border border-[#2D3748] bg-[#111827] rounded-xl p-3 text-center shadow-lg">
+
+                  <div className="border border-[#2D3748] bg-[#111827] rounded-xl p-3 text-center shadow-lg mt-4">
                     <span className="text-[10px] font-mono text-slate-500 uppercase block mb-1">HEALTH MONITOR</span>
                     <p className="text-lg font-bold text-[#22C55E] font-mono">74%</p>
                   </div>
