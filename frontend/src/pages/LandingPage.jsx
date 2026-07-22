@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
 export default function LandingPage() {
   return (
@@ -33,12 +34,24 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-3.5">
-            <Link to="/app" className="px-4.5 py-2 rounded-lg text-sm font-medium border border-[#242737] hover:bg-[#161923] transition-all">
-              Sign in
-            </Link>
-            <Link to="/app" className="px-4.5 py-2 rounded-lg text-sm font-medium bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white shadow-md hover:-translate-y-0.5 transition-all">
-              Start free scan
-            </Link>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-[18px] py-2 rounded-lg text-sm font-medium border border-[#242737] hover:bg-[#161923] transition-all cursor-pointer">
+                  Sign in
+                </button>
+              </SignInButton>
+              <SignInButton mode="modal">
+                <button className="px-[18px] py-2 rounded-lg text-sm font-medium bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white shadow-md hover:-translate-y-0.5 transition-all cursor-pointer">
+                  Start free scan
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <Link to="/app" className="px-[18px] py-2 rounded-lg text-sm font-medium bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white shadow-md hover:-translate-y-0.5 transition-all">
+                Go to Workspace
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
         </div>
       </nav>
@@ -61,9 +74,18 @@ export default function LandingPage() {
             </p>
 
             <div className="flex gap-3.5 mb-9">
-              <Link to="/app" className="px-[18px] py-2.5 rounded-lg text-sm font-medium bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white shadow-md hover:-translate-y-0.5 transition-all">
-                Connect a repo
-              </Link>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="px-[18px] py-2.5 rounded-lg text-sm font-medium bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white shadow-md hover:-translate-y-0.5 transition-all cursor-pointer">
+                    Connect a repo
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link to="/app" className="px-[18px] py-2.5 rounded-lg text-sm font-medium bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white shadow-md hover:-translate-y-0.5 transition-all">
+                  Connect a repo
+                </Link>
+              </SignedIn>
               <Link to="/app" className="px-[18px] py-2.5 rounded-lg text-sm font-medium border border-[#242737] hover:bg-[#161923] transition-all">
                 Watch a 90s demo
               </Link>
@@ -188,9 +210,18 @@ export default function LandingPage() {
                 <li>✓ Core vulnerability rules</li>
                 <li>✓ Community support</li>
               </ul>
-              <Link to="/app" className="w-full block text-center py-2.5 rounded-lg border border-[#242737] text-xs font-semibold hover:bg-[#161923] transition-all">
-                Get started
-              </Link>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="w-full block text-center py-2.5 rounded-lg border border-[#242737] text-xs font-semibold hover:bg-[#161923] transition-all cursor-pointer">
+                    Get started
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link to="/app" className="w-full block text-center py-2.5 rounded-lg border border-[#242737] text-xs font-semibold hover:bg-[#161923] transition-all">
+                  Get started
+                </Link>
+              </SignedIn>
             </div>
 
             {/* Team */}
@@ -207,9 +238,18 @@ export default function LandingPage() {
                 <li>✓ Trend dashboard</li>
                 <li>✓ Slack & webhook alerts</li>
               </ul>
-              <Link to="/app" className="w-full block text-center py-2.5 rounded-lg bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white text-xs font-semibold shadow-md transition-all">
-                Start free trial
-              </Link>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="w-full block text-center py-2.5 rounded-lg bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white text-xs font-semibold shadow-md transition-all cursor-pointer">
+                    Start free trial
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link to="/app" className="w-full block text-center py-2.5 rounded-lg bg-gradient-to-br from-[#8B7CF6] to-[#6C5CE7] text-white text-xs font-semibold shadow-md transition-all">
+                  Start free trial
+                </Link>
+              </SignedIn>
             </div>
 
             {/* Enterprise */}

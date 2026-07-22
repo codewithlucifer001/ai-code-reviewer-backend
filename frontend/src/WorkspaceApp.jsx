@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Editor from '@monaco-editor/react';
 import toast, { Toaster } from 'react-hot-toast';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { 
   Terminal, Shield, Bug, Folder, Search, Settings, 
   FileText, Play, RefreshCw, Bell, Layers, Activity, 
@@ -188,9 +189,17 @@ export default function WorkspaceApp() {
             <Bell size={15} />
           </button>
           
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#7C3AED] to-[#06B6D4] p-0.5 shadow-md">
-            <div className="w-full h-full bg-[#111827] rounded-[10px] flex items-center justify-center text-xs font-bold font-mono text-[#06B6D4]">AM</div>
-          </div>
+          {/* Clerk Auth Avatar / Sign In */}
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="text-xs font-mono text-slate-300 hover:text-white px-3 py-1.5 border border-[#2D3748] rounded-lg cursor-pointer">
+                Sign In
+              </button>
+            </SignInButton>
+          </SignedOut>
         </div>
       </header>
 
