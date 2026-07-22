@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.parser import analyze_code_structure
 from app.reviewer import generate_ai_review
@@ -10,6 +11,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Enable CORS for all origins (required for Vercel frontend requests)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
+
 class CodeSubmission(BaseModel):
     filename: str
     code: str
@@ -18,13 +28,25 @@ class CodeSubmission(BaseModel):
 def read_root():
     return {"status": "online", "engine": "FastAPI + Local Ollama Engine"}
 
+# Health check route required for SnapDeploy container monitoring
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok"}
+
+# Explicit OPTIONS preflight handler
+@app.options("/api/review")
+async def options_review():
+    return Response(status_code=200)
+
 @app.post("/api/review")
 async def review_code(submission: CodeSubmission):
     if not submission.code.strip():
         raise HTTPException(status_code=400, detail="Source code content cannot be empty.")
+    
     ast_metadata = analyze_code_structure(submission.code)
     if "error" in ast_metadata:
-         raise HTTPException(status_code=422, detail=ast_metadata["error"])
+        raise HTTPException(status_code=422, detail=ast_metadata["error"])
+        
     review_output = generate_ai_review(submission.code, ast_metadata)
     return {"filename": submission.filename, "review": review_output}
 
